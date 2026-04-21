@@ -59,8 +59,8 @@ The commands below assume that you are in the repository root.
 Use `--cleanenv` so host Python variables such as `PYTHONPATH` do not leak into the container runtime.
 
 ```bash
-apptainer exec --cleanenv --bind "$PWD":/workspace pstime.sif \
-  bash -lc 'cd /workspace && jupyter lab --ip 0.0.0.0 --port 8888 --no-browser'
+apptainer exec --cleanenv pstime.sif \
+  jupyter lab --ip 0.0.0.0 --port 8888 --no-browser
 ```
 
 What to expect:
@@ -86,8 +86,8 @@ apptainer exec --cleanenv pstime.sif \
 This is useful when you want to validate the notebook from the command line.
 
 ```bash
-apptainer exec --cleanenv --bind "$PWD":/workspace pstime.sif \
-  bash -lc 'cd /workspace && jupyter nbconvert --to notebook --execute scripts/pstime_protocol.ipynb --output pstime_protocol.executed.ipynb'
+apptainer exec --cleanenv pstime.sif \
+  jupyter nbconvert --to notebook --execute scripts/pstime_protocol.ipynb --output pstime_protocol.executed.ipynb
 ```
 
 ## Notes that improve day-to-day use
@@ -106,8 +106,8 @@ In this repository, that error was traced to the host environment leaking `PYTHO
 The fix is to run the container with `--cleanenv`:
 
 ```bash
-apptainer exec --cleanenv --bind "$PWD":/workspace pstime.sif \
-  bash -lc 'cd /workspace && jupyter lab --ip 0.0.0.0 --port 8888 --no-browser'
+apptainer exec --cleanenv pstime.sif \
+  jupyter lab --ip 0.0.0.0 --port 8888 --no-browser
 ```
 
 If you want to inspect the problem explicitly on your machine:
@@ -132,11 +132,11 @@ apptainer exec --cleanenv pstime.sif python -c "import jupyterlab, jupyter_clien
 
 ## Validation notes
 
-The following checks were run on April 14, 2026 in this workspace:
+The following checks were run on April 14, 2026 in this environment:
 
 - `apptainer build --fakeroot /tmp/pstime-readme-test.sif env/pstime.def`: completed successfully.
 - `apptainer exec --cleanenv /tmp/pstime-readme-test.sif python -c "import six, scanpy, jupyterlab, jupyter_client; print('OK')"`: completed successfully.
-- `apptainer exec --cleanenv --bind "$PWD":/workspace /tmp/pstime-readme-test.sif bash -lc 'cd /workspace && jupyter lab --version && jupyter nbconvert --version'`: returned `4.5.6` and `7.17.1`.
+- `apptainer exec --cleanenv /tmp/pstime-readme-test.sif bash -lc 'jupyter lab --version && jupyter nbconvert --version'`: returned `4.5.6` and `7.17.1`.
 - The pre-existing local `pstime.sif` failed without `--cleanenv` because host `PYTHONPATH` leaked into the container runtime.
 - A full `jupyter nbconvert --execute scripts/pstime_protocol.ipynb` run was started, but it was not confirmed to completion in this session, so the command is kept as documented and recommended, but not marked as fully validated here.
 
